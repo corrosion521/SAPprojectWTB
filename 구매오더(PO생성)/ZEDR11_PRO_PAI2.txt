@@ -1,0 +1,174 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR11_PRO_PAI2
+*&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR11_PRO_PAI
+*&---------------------------------------------------------------------*
+*&---------------------------------------------------------------------*
+*&      Module  EXIT-COMMAND  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE EXIT-COMMAND INPUT.
+  CASE OK_CODE.
+    WHEN 'BACK' OR 'CANC'.
+      LEAVE TO SCREEN 0.
+    WHEN 'EXIT'.
+      LEAVE PROGRAM.
+  ENDCASE.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0200  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0200 INPUT.
+*  CASE OK_CODE.
+*
+*    WHEN 'SAVE'.
+*
+*      MODIFY ZEDT11_701 FROM TABLE GT_TABLE.
+*
+*    ENDCASE.
+ENDMODULE.
+*&---------------------------------------------------------------------*
+*&      Module  USER_COMMAND_0100  INPUT
+*&---------------------------------------------------------------------*
+*       text
+*----------------------------------------------------------------------*
+MODULE USER_COMMAND_0100 INPUT.
+    CASE OK_CODE.
+      WHEN 'APND'.
+
+        GS_TABLE-ZWERKS = 1100.
+        GS_TABLE-ZLGORT = 1101.
+        GS_TABLE-ZEBELP = 10.
+*        GS_TABLE-WEARS =
+*        GS_TABLE-ZMWSKZ =
+
+      " DB -> ITAB
+      "구매처 마스터용(통화, 세금코드)
+         SELECT * INTO CORRESPONDING FIELDS OF TABLE GT_PTABLE
+         FROM ZEDT11_701.
+
+        LOOP AT GT_PTABLE INTO GS_PTABLE.
+          IF P_ZLIFNR = GS_PTABLE-ZLIFNR.
+            GS_TABLE-ZWAERS = GS_PTABLE-ZWAERS.
+            GS_TABLE-ZMWSKZ = GS_PTABLE-ZMWSKZ.
+          ENDIF.
+        ENDLOOP.
+
+      "구매처 마스터용(통화, 세금코드)
+         SELECT * INTO CORRESPONDING FIELDS OF TABLE GT_PTABLE
+         FROM ZEDT11_702.
+
+
+        "마지막 인덱스 추정"
+        DATA : GS_LASTIDX TYPE I.
+        LOOP AT GT_TABLE INTO GS_TABLE.
+          GS_LASTIDX = GS_TABLE-ZEBELP.
+        ENDLOOP.
+
+        "이전에 데이터 + 10
+        IF GS_LASTIDX >= 10.
+          GS_TABLE-ZEBELP = GS_LASTIDX + 10.
+        ENDIF.
+
+
+
+
+
+
+
+        APPEND GS_TABLE TO GT_TABLE.
+       WHEN 'DELT'.
+
+
+        LOOP AT GT_TABLE INTO GS_TABLE.
+          GS_LASTIDX = GS_TABLE-ZEBELP.
+        ENDLOOP.
+
+        "마지막 인덱스 삭제
+        DELETE TABLE GT_TABLE WITH TABLE KEY ZEBELP = GS_LASTIDX.
+
+
+       WHEN 'SAVE'.
+
+
+
+    "마지막 인덱스 추정"
+        SELECT * INTO CORRESPONDING FIELDS OF TABLE GT_HITABLE
+         FROM ZEDT11_703.
+          DATA: GS_LASTIDX2 TYPE I.
+          LOOP AT GT_HITABLE INTO GS_HITABLE.
+            GS_LASTIDX2 = GS_HITABLE-ZEBELN.
+          ENDLOOP.
+
+          IF ( GS_LASTIDX2 = 0 ).
+            GS_HITABLE-ZEBELN = 1.
+          ELSE.
+            GS_HITABLE-ZEBELN = GS_LASTIDX2 + 1.
+          ENDIF.
+
+
+             " DB -> ITAB
+      "구매처 마스터용(통화, 세금코드)
+     "구매처 마스터용(통화, 세금코드)
+         SELECT * INTO CORRESPONDING FIELDS OF TABLE GT_HPTABLE
+         FROM ZEDT11_701.
+
+ "        DATA : MNUM TYPE C LENGTH 10."구매처 코드
+
+           LOOP AT GT_HPTABLE INTO GS_HPTABLE.
+             IF P_ZLIFNR = GS_HPTABLE-ZLIFNR.
+               GS_HTABLE-ZWAERS = GS_HPTABLE-ZWAERS.
+             ENDIF.
+           ENDLOOP.
+
+
+
+         "헤더
+         GS_HTABLE-ZEBELN = GS_HITABLE-ZEBELN.
+         GS_HTABLE-ZBUKRS = P_ZBUKRS.
+         GS_HTABLE-ZKTOKK = P_ZEKORG."구매처그룹 = 구매조직
+         GS_HTABLE-ZEKORG = P_ZEKORG.
+         GS_HTABLE-ZLIFNR = P_ZLIFNR.
+         GS_HTABLE-ZBEDAT = P_ZBEDAT.
+         APPEND GS_HTABLE TO GT_HTABLE.
+
+         MODIFY ZEDT11_703 FROM TABLE GT_HTABLE.
+
+         "아이템
+
+
+    "마지막 인덱스 추정"
+        SELECT * INTO CORRESPONDING FIELDS OF TABLE GT_IITABLE
+         FROM ZEDT11_704.
+          DATA: GS_LASTIDX3 TYPE I.
+          LOOP AT GT_IITABLE INTO GS_IITABLE.
+            GS_LASTIDX3 = GS_IITABLE-ZEBELN.
+          ENDLOOP.
+
+          IF ( GS_LASTIDX3 = 0 ).
+            GS_LASTIDX3 = 1.
+          ELSE.
+            GS_LASTIDX3 = GS_LASTIDX3 + 1.
+          ENDIF.
+
+
+
+         MOVE-CORRESPONDING GT_TABLE TO GT_ITABLE.
+
+
+        LOOP AT GT_ITABLE INTO GS_ITABLE.
+          GS_ITABLE-ZEBELN = GS_LASTIDX3.
+          GS_LASTIDX3 = GS_LASTIDX3 + 1.
+          MODIFY TABLE GT_ITABLE FROM GS_ITABLE.
+        ENDLOOP.
+
+
+         MODIFY ZEDT11_704 FROM TABLE GT_ITABLE.
+
+   ENDCASE.
+ENDMODULE.

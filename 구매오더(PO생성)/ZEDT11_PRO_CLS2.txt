@@ -1,0 +1,72 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDT11_PRO_CLS2
+*&---------------------------------------------------------------------*
+
+"정의부
+CLASS EVENT DEFINITION.
+  PUBLIC SECTION.
+*  METHODS HANDLE_TOOLBAR FOR EVENT TOOLBAR "이벤트명 .참고로 앞의 HANDLE_TOOLBAR에서 아래 실행부로 이동해서 실행됨.
+*                         OF CL_GUI_ALV_GRID " 그리드(메서드를 실행하는 주체니까)
+*                         IMPORTING E_OBJECT " INPUT값들
+*                                   E_INTERACTIVE.
+*  "이번엔 유저커맨드
+*  METHODS HANDLE_USER_COMMAND FOR EVENT USER_COMMAND
+*                              OF CL_GUI_ALV_GRID
+*                              IMPORTING E_UCOMM.
+
+  METHODS HANDLE_DATA_CHANGED FOR EVENT DATA_CHANGED
+                              OF CL_GUI_ALV_GRID
+                              IMPORTING ER_DATA_CHANGED
+                                        E_ONF4
+                                        E_ONF4_BEFORE
+                                        E_ONF4_AFTER
+                                        E_UCOMM.
+*
+*  METHODS HANDLE_DATA_FINISHED FOR EVENT DATA_CHANGED_FINISHED
+*                               OF CL_GUI_ALV_GRID
+*                               IMPORTING E_MODIFIED
+*                                         ET_GOOD_CELLS.
+
+  "SEARCH_HELP
+  METHODS : HANDLE_ONF4
+     FOR EVENT ONF4 OF CL_GUI_ALV_GRID
+     IMPORTING E_FIELDNAME
+                                 E_FIELDVALUE
+                                 ES_ROW_NO
+                                 ER_EVENT_DATA
+                                 ET_BAD_CELLS
+                                 E_DISPLAY.
+
+ENDCLASS.
+
+"실행부
+CLASS EVENT IMPLEMENTATION.
+*  METHOD HANDLE_TOOLBAR. "클래스로부터 실행할 메서드 명
+*    PERFORM ALV_HANDLE_TOOLBAR USING E_OBJECT E_INTERACTIVE. "메소드의 로직
+*  ENDMETHOD.
+*  METHOD HANDLE_USER_COMMAND.
+*    PERFORM ALV_HANDLE_USER_COMMAND USING E_UCOMM.
+*  ENDMETHOD.
+*  METHOD HANDLE_DATA_FINISHED.
+*    PERFORM ALV_HANDLE_DATA_FINISHED USING E_MODIFIED
+*                                           ET_GOOD_CELLS.
+*  ENDMETHOD.
+  METHOD HANDLE_DATA_CHANGED.
+    PERFORM ALV_HANDLE_DATA_CHANGED USING ER_DATA_CHANGED
+                                          E_ONF4
+                                          E_ONF4_BEFORE
+                                          E_ONF4_AFTER
+                                          E_UCOMM.
+   ENDMETHOD.
+    METHOD HANDLE_ONF4.
+
+     PERFORM ALV_ONF4 USING  E_FIELDNAME
+
+                                        E_FIELDVALUE
+                                        ES_ROW_NO
+                                        ER_EVENT_DATA
+                                       ET_BAD_CELLS
+                                      E_DISPLAY.
+    ENDMETHOD.
+
+ENDCLASS.

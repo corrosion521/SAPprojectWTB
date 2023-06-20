@@ -1,0 +1,18 @@
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR11_PRO_SCR2
+*&---------------------------------------------------------------------*
+
+*&---------------------------------------------------------------------*
+*&  Include           ZEDR11_PRO_SCR
+*&---------------------------------------------------------------------*
+TABLES ZEDT11_701.
+
+SELECTION-SCREEN BEGIN OF BLOCK B1 WITH FRAME.
+  PARAMETERS : P_ZBUKRS LIKE ZEDT11_703-ZBUKRS DEFAULT 1100.
+  PARAMETERS : P_ZEKORG LIKE ZEDT11_703-ZEKORG DEFAULT 1100 MODIF ID M1.
+  PARAMETERS : P_ZBEDAT LIKE ZEDT11_703-ZBEDAT DEFAULT SY-DATUM.
+  PARAMETERS : P_ZLIFNR LIKE ZEDT11_701-ZLIFNR.
+ " SELECT-OPTIONS : S_ZCODE FOR ZEDT11_201-ZCODE NO INTERVALS NO-EXTENSION.
+ " SELECT-OPTIONS : S_ZUNIQ FOR ZEDT11_201-ZUNIQ NO INTERVALS NO-EXTENSION MODIF ID M2.
+
+SELECTION-SCREEN END OF BLOCK B1.

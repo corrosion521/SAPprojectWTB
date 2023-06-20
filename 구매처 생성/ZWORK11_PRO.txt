@@ -1,0 +1,50 @@
+*&---------------------------------------------------------------------*
+*& Report ZWORK11_PRO
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT ZWORK11_PRO MESSAGE-ID ZMED11.
+
+INCLUDE ZEDT11_PRO_CLS.
+INCLUDE ZEDR11_PRO_TOP.
+INCLUDE ZEDR11_PRO_SCR.
+INCLUDE ZEDR11_PRO_F01.
+INCLUDE ZEDR11_PRO_PBO.
+INCLUDE ZEDR11_PRO_PAI.
+
+
+"스크린 초기화
+*INITIALIZATION.
+*  PERFORM SET_INITIAL.
+
+"SELECTION SCREEN 제어
+AT SELECTION-SCREEN OUTPUT.
+  PERFORM SET_SCREEN.
+
+
+START-OF-SELECTION.
+
+
+
+IF P_R1 = 'X'.
+   "1. R1입력 후 실행 . 데이터 수집.
+
+   "2. 통화 키 변형, 직급 명 변형, 승인처리.
+   "PERFORM CHANGE_DATE_R1.
+   CALL SCREEN 100.
+
+ELSEIF P_R2 = 'X'.
+   "1. R2입력 후 실행 . 데이터 수집.
+   PERFORM SELECT_DATA.
+   "PERFORM CHANGE_DATE_R1. "로직같음
+
+   "2. 통화 키 변형, 직급 명 변형, 승인처리.
+  " PERFORM CHANGE_DATE_R1.
+
+    IF GT_TABLE IS NOT INITIAL.
+      CALL SCREEN 200.
+    ELSE.
+      MESSAGE I001.
+      EXIT.
+    ENDIF.
+ENDIF.

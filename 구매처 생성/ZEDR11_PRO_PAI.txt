@@ -1,0 +1,59 @@
+&---------------------------------------------------------------------
+&  Include           ZEDR11_PRO_PAI
+&---------------------------------------------------------------------
+&---------------------------------------------------------------------
+&      Module  EXIT-COMMAND  INPUT
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+MODULE EXIT-COMMAND INPUT.
+  CASE OK_CODE.
+    WHEN 'BACK' OR 'CANC'.
+      LEAVE TO SCREEN 0.
+    WHEN 'EXIT'.
+      LEAVE PROGRAM.
+  ENDCASE.
+ENDMODULE.
+&---------------------------------------------------------------------
+&      Module  USER_COMMAND_0200  INPUT
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+MODULE USER_COMMAND_0200 INPUT.
+  CASE OK_CODE.
+
+    WHEN 'SAVE'.
+
+      MODIFY ZEDT11_701 FROM TABLE GT_TABLE.
+
+    ENDCASE.
+ENDMODULE.
+&---------------------------------------------------------------------
+&      Module  USER_COMMAND_0100  INPUT
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+MODULE USER_COMMAND_0100 INPUT.
+    CASE OK_CODE.
+      WHEN 'APND'.
+        GS_TABLE-ZBUKRS = S_ZBUKRS-LOW.
+        GS_TABLE-ZKTOKK = S_ZKTOKK.
+
+        APPEND GS_TABLE TO GT_TABLE.
+      WHEN 'CREATE'.
+
+        DB에 플러스라인 추가
+        MODIFY ZEDT11_701 FROM TABLE GT_TABLE.
+
+
+        구매처 마스터에 데이터 추가
+        LOOP AT GT_TABLE INTO GS_TABLE.
+          GS_TABLESH-ZLIFNR = GS_TABLE-ZLIFNR.
+          GS_TABLESH-ZLIFNR_NAME = GS_TABLE-ZNAME1.
+          APPEND GS_TABLESH TO GT_TABLESH.
+        ENDLOOP.
+
+
+        MODIFY ZEDT11_799 FROM TABLE GT_TABLESH.
+    ENDCASE.
+ENDMODULE.

@@ -1,0 +1,812 @@
+&---------------------------------------------------------------------
+&  Include           ZEDR11_PRO_F01
+&---------------------------------------------------------------------
+
+FORM SET_INITIAL .
+ DATA GV_DATEST TYPE SY-DATUM,
+        GV_DATEFN TYPE SY-DATUM.
+
+
+  사원 정보용
+    CONCATENATE SY-DATUM(6) '01' INTO GV_DATEST.
+
+    말일
+    CALL FUNCTION 'RP_LAST_DAY_OF_MONTHS'
+      EXPORTING
+        DAY_IN = SY-DATUM     기준이 되는 임의의 일자
+      IMPORTING
+        LAST_DAY_OF_MONTH = GV_DATEFN    해당월의 마지막 일자
+      EXCEPTIONS
+        DAY_IN_NO_DATE = 1
+        OTHERS = 2.
+
+
+
+    S_ZDATE-SIGN = 'I'.
+    S_ZDATE-OPTION = 'BT'.
+    S_ZDATE-LOW = gv_datest.
+    S_ZDATE-HIGH = gv_datefn.
+
+    S_ZPDATE-SIGN = 'I'.
+    S_ZPDATE-OPTION = 'BT'.
+    S_ZPDATE-LOW = gv_datest.
+    S_ZPDATE-HIGH = gv_datefn.
+
+    APPEND S_ZDATE.
+    APPEND S_ZPDATE.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  SELECT_DATA
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM SELECT_DATA .
+   SELECT  INTO CORRESPONDING FIELDS OF TABLE GT_TABLE
+   FROM ZEDT11_701.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  SET_SCREEN
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM SET_SCREEN .
+   LOOP AT SCREEN.
+    IF SCREEN-GROUP1 = 'M2'.
+      IF P_R1 = 'X'.
+        SCREEN-ACTIVE = '0'.
+      ENDIF.
+    ENDIF.
+    IF SCREEN-GROUP1 = 'M1'.
+      IF P_R2 = 'X'.
+        SCREEN-ACTIVE = '0'.
+      ENDIF.
+    ENDIF.
+    MODIFY SCREEN.
+  ENDLOOP.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  LAYOUT_SET
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM LAYOUT_SET .
+  GS_LAYOUT-ZEBRA = 'X'.
+
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  FIELD_CATALOG
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM FIELD_CATALOG .
+  CLEAR  GS_FIELDCAT, GT_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 1.
+  GS_FIELDCAT-FIELDNAME = 'ZEBELP'.
+  GS_FIELDCAT-SCRTEXT_M = '품목'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 2.
+  GS_FIELDCAT-FIELDNAME = 'ZMATNR'.
+  GS_FIELDCAT-SCRTEXT_M = '자재'.
+  GS_FIELDCAT-EDIT = 'X'.
+  GS_FIELDCAT-F4AVAILABL = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 3.
+  GS_FIELDCAT-FIELDNAME = 'ZMAKTX'.
+  GS_FIELDCAT-EDIT = 'X'.
+  GS_FIELDCAT-SCRTEXT_M = '자재명'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 4.
+  GS_FIELDCAT-FIELDNAME = 'ZMENGE'.
+  GS_FIELDCAT-SCRTEXT_M = 'PO수량'.
+  GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 5.
+  GS_FIELDCAT-FIELDNAME = 'ZMEINS'.
+  GS_FIELDCAT-SCRTEXT_M = '단위'.
+  GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 6.
+  GS_FIELDCAT-FIELDNAME = 'ZNETPRT'.
+  GS_FIELDCAT-SCRTEXT_M = '단가'.
+  GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 7.
+  GS_FIELDCAT-FIELDNAME = 'ZWAERS'.
+  GS_FIELDCAT-SCRTEXT_M = '통화'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 8.
+  GS_FIELDCAT-FIELDNAME = 'ZMWSKZ'.
+  GS_FIELDCAT-SCRTEXT_M = '세금코드'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 9.
+  GS_FIELDCAT-FIELDNAME = 'ZPRDAT'.
+  GS_FIELDCAT-SCRTEXT_M = '납품일'.
+
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 10.
+  GS_FIELDCAT-FIELDNAME = 'ZWERKS'.
+  GS_FIELDCAT-SCRTEXT_M = '플랜트'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+      CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 11.
+  GS_FIELDCAT-FIELDNAME = 'ZLGORT'.
+  GS_FIELDCAT-SCRTEXT_M = '저장위치'.
+
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  ALV_SORT
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM ALV_SORT .
+  GS_SORT-SPOS = 1.
+  GS_SORT-FIELDNAME = 'ZLIFNR'.
+  GS_SORT-UP ='X'.
+
+  APPEND GS_SORT TO GT_SORT.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  CALL_ALV
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM CALL_ALV .
+CALL METHOD GC_GRID-SET_TABLE_FOR_FIRST_DISPLAY
+    EXPORTING
+      I_BUFFER_ACTIVE               =
+      I_BYPASSING_BUFFER            =
+      I_CONSISTENCY_CHECK           =
+      I_STRUCTURE_NAME              =
+     IS_VARIANT                    = GS_VARIANT
+     I_SAVE                        = 'A'
+      I_DEFAULT                     = 'X'
+      IS_LAYOUT                     = GS_LAYOUT
+      IS_PRINT                      =
+      IT_SPECIAL_GROUPS             =
+      IT_TOOLBAR_EXCLUDING          =
+      IT_HYPERLINK                  =
+      IT_ALV_GRAPHICS               =
+      IT_EXCEPT_QINFO               =
+      IR_SALV_ADAPTER               =
+    CHANGING
+      IT_OUTTAB                     = GT_TABLE
+     IT_FIELDCATALOG               = GT_FIELDCAT
+     IT_SORT                       = GT_SORT
+      IT_FILTER                     =
+    EXCEPTIONS
+      INVALID_PARAMETER_COMBINATION = 1
+      PROGRAM_ERROR                 = 2
+      TOO_MANY_LINES                = 3
+      others                        = 4
+          .
+  IF SY-SUBRC  0.
+   Implement suitable error handling here
+  ENDIF.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  CREATE_OBJECT
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM CREATE_OBJECT .
+   CREATE OBJECT GC_DOCKING
+    EXPORTING
+      PARENT                      =
+      REPID                       = SY-REPID
+      DYNNR                       = SY-DYNNR
+      SIDE                        = DOCK_AT_LEFT
+      EXTENSION                   = 2000
+      STYLE                       =
+      LIFETIME                    = lifetime_default
+      CAPTION                     =
+      METRIC                      = 0
+      RATIO                       =
+      NO_AUTODEF_PROGID_DYNNR     =
+      NAME                        =
+    EXCEPTIONS
+      CNTL_ERROR                  = 1
+      CNTL_SYSTEM_ERROR           = 2
+      CREATE_ERROR                = 3
+      LIFETIME_ERROR              = 4
+      LIFETIME_DYNPRO_DYNPRO_LINK = 5
+      others                      = 6
+      .
+  IF SY-SUBRC  0.
+   MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+              WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+  ENDIF.
+
+CREATE OBJECT GC_GRID
+  EXPORTING
+    I_SHELLSTYLE      = 0
+    I_LIFETIME        =
+    I_PARENT          = GC_DOCKING
+    I_APPL_EVENTS     = space
+    I_PARENTDBG       =
+    I_APPLOGPARENT    =
+    I_GRAPHICSPARENT  =
+    I_NAME            =
+    I_FCAT_COMPLETE   = SPACE
+  EXCEPTIONS
+    ERROR_CNTL_CREATE = 1
+    ERROR_CNTL_INIT   = 2
+    ERROR_CNTL_LINK   = 3
+    ERROR_DP_CREATE   = 4
+    others            = 5
+    .
+IF SY-SUBRC  0.
+ MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+            WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4.
+ENDIF.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  REFRESH
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM REFRESH .
+      DATA  LS_STABLE TYPE LVC_S_STBL.
+
+  LS_STABLE-ROW = 'X'.
+  LS_STABLE-COL = 'X'.
+
+  CALL METHOD GC_GRID-REFRESH_TABLE_DISPLAY
+    EXPORTING
+      IS_STABLE      = LS_STABLE
+      I_SOFT_REFRESH =
+    EXCEPTIONS
+      FINISHED       = 1
+      others         = 2
+          .
+  IF SY-SUBRC  0.
+   Implement suitable error handling here
+  ENDIF.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  ALV_HANDLE_DATA_FINISHED
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+      --P_E_MODIFIED  text
+      --P_ET_GOOD_CELLS  text
+----------------------------------------------------------------------
+FORM ALV_HANDLE_DATA_FINISHED  USING    P_MODIFIED
+                                        P_GOOD_CELLS TYPE LVC_T_MODI.
+    DATA LS_MODI TYPE LVC_S_MODI.
+
+    LOOP AT P_GOOD_CELLS INTO LS_MODI.
+      IF LS_MODI-FIELDNAME = 'ZSTCD2'.
+        READ TABLE GT_TABLE INTO GS_TABLE INDEX LS_MODI-ROW_ID.
+
+
+      ENDIF.
+
+      MODIFY GT_TABLE FROM GS_TABLE INDEX LS_MODI-ROW_ID.
+    ENDLOOP.
+
+    PERFORM REFRESH.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  CLASS_EVENT
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM CLASS_EVENT .
+  CREATE OBJECT GO_EVENT.
+
+  REGISTER
+  CALL METHOD GC_GRID-REGISTER_EDIT_EVENT
+    EXPORTING
+      I_EVENT_ID = CL_GUI_ALV_GRID=MC_EVT_MODIFIED
+    EXCEPTIONS
+      ERROR      = 1
+      others     = 2
+          .
+  IF SY-SUBRC  0.
+   Implement suitable error handling here
+  ENDIF.
+
+
+  SET HANDLER GO_EVENT-HANDLE_DATA_FINISHED FOR GC_GRID.
+  SET HANDLER GO_EVENT-HANDLE_DATA_CHANGED FOR GC_GRID.
+
+  SET HANDLER GO_EVENT-HANDLE_ONF4 FOR GC_GRID.
+
+
+
+    TOP부분에 선언(로컬 변수로 선언해도 됨)
+
+    DATA  GT_F4 TYPE LVC_T_F4,
+
+                 GS_F4 TYPE LVC_S_F4.
+
+
+
+    CLEAR  GT_F4.
+
+    GS_F4-FIELDNAME = 'ZMATNR'.    F4적용 필드
+
+    GS_F4-REGISTER = 'X'.                      이 부분을 X해줘야 사용할 수 있음
+
+    GS_F4-GETBEFORE = ''.                     F4하기 전에 데이터 체인지 이벤트를 먼저 탐
+
+    GS_F4-CHNGEAFTER = ''.                    F4에서 값 선택 후 데이터 체인지 이벤트 탐
+
+    APPEND GS_F4 TO GT_F4.
+
+
+
+    CALL METHOD GC_GRID-REGISTER_F4_FOR_FIELDS
+
+      EXPORTING
+
+         IT_F4 = GT_F4.
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  ALV_HANDLE_DATA_CHANGED
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+      --P_ER_DATA_CHANGED  text
+      --P_E_ONF4  text
+      --P_E_ONF4_BEFORE  text
+      --P_E_ONF4_AFTER  text
+      --P_E_UCOMM  text
+----------------------------------------------------------------------
+FORM ALV_HANDLE_DATA_CHANGED  USING    P_DATA_CHANGED TYPE REF TO CL_ALV_CHANGED_DATA_PROTOCOL
+                                       P_ONF4
+                                       P_ONF4_BEFORE
+                                       P_ONF4_AFTER
+                                       P_UCOMM.
+
+
+  DATA  LS_MODI TYPE LVC_S_MODI.
+  CLEAR  LS_MODI, GS_TABLE.
+  DATA  LV_LEN(02).
+
+  LOOP AT P_DATA_CHANGED-MT_GOOD_CELLS INTO LS_MODI.
+    IF LS_MODI-FIELDNAME = 'ZMATNR'.
+      READ TABLE GT_TABLE INTO GS_TABLE INDEX LS_MODI-ROW_ID.
+      DATA MFLAG VALUE 0.
+
+
+      GS_TABLE-ZMATNR = LS_MODI-VALUE. ZMATNR값을 넣음.
+
+      CLEAR  GS_NTABLE.
+      자재이름 찾기'
+      LOOP AT GT_NTABLE INTO GS_NTABLE.
+        IF GS_TABLE-ZMATNR = GS_NTABLE-ZMATNR.
+          GS_TABLE-ZMAKTX = GS_NTABLE-ZMAKTX.
+          GS_TABLE-ZMEINS = GS_NTABLE-ZMEINS.
+           GS_TABLE-ZWAERS = GS_NTABLE-ZWAERS.
+          통화
+          IF GS_NTABLE-ZWAERS = 'KRW'.
+              DATAGV_TMP TYPE C LENGTH 10.
+              CALL FUNCTION 'CURRENCY_AMOUNT_SAP_TO_IDOC'  
+                EXPORTING
+                  CURRENCY  = 'KRW'
+                  SAP_AMOUNT  = GS_NTABLE-ZNETPR
+                IMPORTING
+                  IDOC_AMOUNT = GV_TMP.
+               GS_TABLE-ZNETPRT = GV_TMP  100.
+          ELSE.
+            GS_TABLE-ZNETPRT = GS_NTABLE-ZNETPR.
+          ENDIF.
+          GS_TABLE-ZPRDAT = P_ZBEDAT + GS_NTABLE-ZAPLFZ.
+          MFLAG = 1.
+          EXIT.
+        ENDIF.
+      ENDLOOP.
+
+      IF MFLAG = 0.
+        MESSAGE I013.
+      ELSE.
+         MFLAG = 0.
+      ENDIF.
+
+
+      MODIFY GT_TABLE FROM GS_TABLE INDEX LS_MODI-ROW_ID.
+      CLEAR GS_TABLE.
+
+     ENDIF.
+      단위
+      IF LS_MODI-FIELDNAME = 'ZMEINS'.
+      READ TABLE GT_TABLE INTO GS_TABLE INDEX LS_MODI-ROW_ID.
+       DATA MFLAG2 VALUE 0.
+
+      GS_TABLE-ZMEINS = LS_MODI-VALUE. ZMATNR값을 넣음.
+
+      CLEAR  GS_NTABLE.
+      자재이름 찾기'
+      LOOP AT GT_NTABLE INTO GS_NTABLE.
+        IF GS_TABLE-ZMEINS = GS_NTABLE-ZMEINS.
+          MFLAG2 = 1.
+          EXIT.
+        ENDIF.
+      ENDLOOP.
+
+      IF MFLAG2 = 0.
+        MESSAGE I011.
+      ELSE.
+         MFLAG2 = 0.
+      ENDIF.
+
+
+      MODIFY GT_TABLE FROM GS_TABLE INDEX LS_MODI-ROW_ID.
+      CLEAR GS_TABLE.
+
+     ENDIF.
+
+
+      단가
+      IF LS_MODI-FIELDNAME = 'ZNETPRT'.
+      READ TABLE GT_TABLE INTO GS_TABLE INDEX LS_MODI-ROW_ID.
+       DATA MFLAG3 VALUE 0.
+
+      GS_TABLE-ZNETPR = LS_MODI-VALUE. ZMATNR값을 넣음.
+
+      CLEAR  GS_NTABLE.
+      자재이름 찾기'
+      LOOP AT GT_NTABLE INTO GS_NTABLE.
+        IF GS_TABLE-ZNETPR = GS_NTABLE-ZNETPR.
+          MFLAG3 = 1.
+          EXIT.
+        ENDIF.
+      ENDLOOP.
+
+      IF MFLAG3 = 0.
+        MESSAGE I012.
+      ELSE.
+         MFLAG3 = 0.
+      ENDIF.
+
+
+      MODIFY GT_TABLE FROM GS_TABLE INDEX LS_MODI-ROW_ID.
+      CLEAR GS_TABLE.
+
+     ENDIF.
+
+
+   ENDLOOP.
+
+   PERFORM REFRESH.
+
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  FIELD_CATALOG2
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM FIELD_CATALOG2 .
+  CLEAR  GS_FIELDCAT, GT_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 1.
+  GS_FIELDCAT-FIELDNAME = 'ZLIFNR'.
+  GS_FIELDCAT-SCRTEXT_M = '구매처번호'.
+    GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 2.
+  GS_FIELDCAT-FIELDNAME = 'ZKTOKK'.
+  GS_FIELDCAT-SCRTEXT_M = '구매처그룹'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 3.
+  GS_FIELDCAT-FIELDNAME = 'ZNAME1'.
+  GS_FIELDCAT-SCRTEXT_M = '구매처이름'.
+    GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 4.
+  GS_FIELDCAT-FIELDNAME = 'ZBUKRS'.
+  GS_FIELDCAT-SCRTEXT_M = '회사코드'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 5.
+  GS_FIELDCAT-FIELDNAME = 'ZEKORG'.
+  GS_FIELDCAT-SCRTEXT_M = '구매조직'.
+    GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 6.
+  GS_FIELDCAT-FIELDNAME = 'ZWAERS'.
+  GS_FIELDCAT-SCRTEXT_M = '통화'.
+    GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 7.
+  GS_FIELDCAT-FIELDNAME = 'ZMWSKZ'.
+  GS_FIELDCAT-SCRTEXT_M = '세금코드'.
+    GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+  IF S_ZKTOKK = 3000.
+      CLEAR  GS_FIELDCAT.
+    GS_FIELDCAT-COL_POS = 8.
+    GS_FIELDCAT-FIELDNAME = 'ZSTCD1'.
+    GS_FIELDCAT-SCRTEXT_M = '개인번호'.
+      GS_FIELDCAT-EDIT = 'X'.
+    APPEND GS_FIELDCAT TO GT_FIELDCAT.
+  ENDIF.
+
+  IF S_ZKTOKK  2000.
+      CLEAR  GS_FIELDCAT.
+    GS_FIELDCAT-COL_POS = 9.
+    GS_FIELDCAT-FIELDNAME = 'ZSTCD2'.
+    GS_FIELDCAT-SCRTEXT_M = '사업자번호'.
+    GS_FIELDCAT-EDIT = 'X'.
+    APPEND GS_FIELDCAT TO GT_FIELDCAT.
+   ENDIF.
+
+    CLEAR  GS_FIELDCAT.
+  GS_FIELDCAT-COL_POS = 10.
+  GS_FIELDCAT-FIELDNAME = 'ZORT01'.
+  GS_FIELDCAT-SCRTEXT_M = '주소'.
+    GS_FIELDCAT-OUTPUTLEN = '15'.
+    GS_FIELDCAT-EDIT = 'X'.
+  APPEND GS_FIELDCAT TO GT_FIELDCAT.
+
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  CHECK_DATA
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+  --  p1        text
+  --  p2        text
+----------------------------------------------------------------------
+FORM CHECK_DATA .
+
+    DB - ITAB
+   SELECT  INTO CORRESPONDING FIELDS OF TABLE GT_CTABLE
+   FROM ZEDT11_799.
+
+
+  SELECT  INTO CORRESPONDING FIELDS OF TABLE GT_CTABLE2
+   FROM ZEDT11_701.
+
+   체크용 변수
+   DATA A LIKE P_ZBUKRS.
+   DATA B LIKE P_ZEKORG.
+
+    CHECK
+   LOOP AT GT_CTABLE INTO GS_CTABLE.
+
+     IF P_ZLIFNR = GS_CTABLE-ZLIFNR.
+       FLAG = FLAG + 1.
+
+     ENDIF.
+
+   ENDLOOP.
+
+  IF FLAG = 1.
+
+     LOOP AT GT_CTABLE2 INTO GS_CTABLE2.
+       IF P_ZLIFNR = GS_CTABLE2-ZLIFNR.
+         IF P_ZBUKRS = GS_CTABLE2-ZBUKRS AND P_ZEKORG = GS_CTABLE2-ZEKORG.
+           FLAG = FLAG + 1.
+       ENDIF.
+       ENDIF.
+     ENDLOOP.
+  ENDIF.
+
+
+
+
+   IF FLAG  2.
+     MESSAGE I010.
+   ENDIF.
+
+
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  ALV_ONF4
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+      --P_E_FIELDNAME  text
+      --P_E_FIELDVALUE  text
+      --P_ES_ROW_NO  text
+      --P_ER_EVENT_DATA  text
+      --P_ET_BAD_CELLS  text
+      --P_E_DISPLAY  text
+----------------------------------------------------------------------
+FORM ALV_ONF4 USING PV_FIELDNAME     TYPE LVC_FNAME
+                                                     PV_FIELDVALUE    TYPE LVC_VALUE
+                                                     PV_ROW_NO          TYPE LVC_S_ROID
+                                                     PV_EVENT_DATA  TYPE REF TO CL_ALV_EVENT_DATA
+                                                     PV_BAD_CELLS     TYPE LVC_T_MODI
+                                                     PV_DISPLAY            TYPE CHAR01.
+
+
+
+DATA  LT_MODI TYPE LVC_T_MODI,
+
+                LS_MODI TYPE LVC_S_MODI.
+
+
+
+DATA  LT_F4 TYPE STANDARD TABLE OF DDSHRETVAL,
+
+                LS_F4 LIKE LINE OF LT_F4.
+
+
+
+FIELD-SYMBOLS FT_F4 TYPE LVC_T_MODI.
+
+
+
+CASE PV_FIELDNAME.
+
+  WHEN 'ZMATNR'.   F4를 적용 하고 싶은 필드-부서코드
+
+     PERFORM F4_DEPT_CD USING PV_FIELDNAME
+
+                                                                            PV_ROW_NO-ROW_ID
+
+                                                  CHANGING PV_FIELDVALUE.
+
+ENDCASE.
+
+
+
+PV_EVENT_DATA-M_EVENT_HANDLED = 'X'.   스탠다드 F4는 무시
+
+
+
+CHECK PV_DISPLAY = ''.   X로 했을 경우에는 F4는 뜨나 값 변경이 안됨. 변경하려면 빈 값 넣기
+
+CHECK PV_FIELDVALUE IS NOT INITIAL.
+
+
+
+ASSIGN PV_EVENT_DATA-M_DATA- TO FT_F4.   FT_F4에 연결
+
+LS_MODI-ROW_ID = PV_ROW_NO-ROW_ID.                       F4를 누른 행번호
+
+LS_MODI-FIELDNAME = PV_FIELDNAME.                             F4를 누른 필드이름-DEPT_CD
+
+LS_MODI-VALUE = PV_FIELDVALUE.                                      F4를 띄워서 누른 값
+
+APPEND LS_MODI TO FT_F4.
+
+
+
+ENDFORM.
+&---------------------------------------------------------------------
+&      Form  F4_DEPT_CD
+&---------------------------------------------------------------------
+       text
+----------------------------------------------------------------------
+      --P_PV_FIELDNAME  text
+      --P_PV_ROW_NO_ROW_ID  text
+      --P_PV_FIELDVALUE  text
+----------------------------------------------------------------------
+FORM F4_DEPT_CD USING PV_FIELDNAME   TYPE LVC_FNAME
+                                      PV_ROW_ID         TYPE INT4
+                            CHANGING PV_FIELDVALUE  TYPE LVC_VALUE.
+
+DATA  LT_RETURN_TAB  TYPE TABLE OF DDSHRETVAL,
+             LS_RETURN_TAB LIKE LINE OF LT_RETURN_TAB.
+
+DATA  LV_RETFIELD         TYPE DFIES-FIELDNAME,
+             LV_DYNPROFIELD TYPE HELP_INFO-DYNPROFLD.
+
+CLEAR  PV_FIELDVALUE.   원래 들어가 있던 DEPT_CD 값 클리어
+
+
+SELECT ZMATNR,   부서코드
+       ZMATNR_NAME   부서명
+    FROM ZEDT11_798
+    INTO TABLE @DATA(LT_0020).
+
+
+
+LV_RETFIELD = 'ZMATNR'.
+
+LV_DYNPROFIELD = PV_FIELDNAME.   F4누른 필드-DEPT_CD
+
+
+
+CALL FUNCTION 'F4IF_INT_TABLE_VALUE_REQUEST'F4 창 띄움
+
+  EXPORTING
+
+     RETFIELD                     = LV_RETFIELD                     DEPT_CD
+
+     DYNPPROG                  = SY-CPROG                         현재 프로그램명-ZTER0010
+
+     DYNPNR                       = SY-DYNNR                         현재 화면번호-0100
+
+     DYNPROFIELD             = LV_DYNPROFIELD             F4누른 필드-DEPT_CD
+
+     VALUE_ORG                 = 'S'                                       가져오는 엔트리가 다수일 경우인 것 같음. 다수일 경우 C로 하면 F4 안뜸
+
+     WINDOW_TITLE           = '부서코드 Search Help'       Search Help 타이틀
+
+TABLES
+
+     VALUE_TAB                  = LT_0020                             부서코드, 부서명 가져온 인터널 테이블
+
+     RETURN_TAB               = LT_RETURN_TAB               F4에서 선택한 값이 들어옴
+
+EXCEPTIONS
+
+     PARAMETER_ERROR  = 1
+
+     NO_VALUES_FOUND  = 2
+
+     OTHERS                       = 3.
+
+
+
+CLEAR  LS_RETURN_TAB.
+
+READ TABLE LT_RETURN_TAB INTO LS_RETURN_TAB INDEX 1.
+
+
+
+CHECK LS_RETURN_TAB IS NOT INITIAL.
+
+
+
+PV_FIELDVALUE = LS_RETURN_TAB-FIELDVAL.   F4에서 선택한 값을 다시 넣어줌
+
+ENDFORM.
